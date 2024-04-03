@@ -2,6 +2,8 @@ import raw from "../../middleware/route.async.wrapper.mjs"
 import express from "express"
 import log from '@ajar/marker'
 import user_model from "./user.model.mjs"
+import { createUserSchema, updateUserSchema, validateRequest } from "./user.validation.mjs";
+
 
 const router = express.Router();
 
@@ -18,7 +20,9 @@ router.use(express.json())
 //     }
 // });
 
-router.post("/", raw(async (req, res) => {
+router.post("/", raw(
+  validateRequest(createUserSchema),
+    async (req, res) => {
      log.obj(req.body, "create a user, req.body:");
      const user = await user_model.create(req.body);
      res.status(200).json(user);
@@ -67,12 +71,15 @@ router.get("/:id",raw(async (req, res) => {
   })
 );
 // UPDATES A SINGLE USER
-router.put("/:id",raw(async (req, res) => {
+router.put("/:id",raw(
+  validateRequest(updateUserSchema),
+  async (req, res) => {
     const user = await user_model.findByIdAndUpdate(req.params.id,req.body, 
                                                     {new: true, upsert: true });
     res.status(200).json(user);
-  })
-);
+  }));
+
+
 // DELETES A USER
 router.delete("/:id",raw(async (req, res) => {
     const user = await user_model.findByIdAndRemove(req.params.id);
