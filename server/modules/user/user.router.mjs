@@ -25,7 +25,24 @@ router.post("/", raw(async (req, res) => {
 }));
 
 
-// GET ALL USERS
+// GET ALL USERS pagination:
+// http://localhost:3030/api/users/paginate?items=100&page=10 - req.params
+router.get( "/paginate",raw(async (req, res) => {
+  const { page, items } = req.query;
+    const users = await user_model.find()
+    // Calc num of docs to skip:
+    .skip((parseInt(page) -1) * parseInt (items))
+    // Limit num of docs returned per page:
+    .limit(parseInt(items)); 
+                                  // .select(`-_id 
+                                  //       first_name 
+                                  //       last_name 
+                                  //       email
+                                  //       phone`);
+    res.status(200).json(users);
+  })
+);
+// GET ALL USERS 
 router.get( "/",raw(async (req, res) => {
     const users = await user_model.find()
                                   // .select(`-_id 
